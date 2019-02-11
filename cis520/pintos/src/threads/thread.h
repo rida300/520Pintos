@@ -100,7 +100,7 @@ struct thread
 	int priority_stack[PRIORITY_DONATE_LEVELS];
 	int nice;
 	int64_t wait_ticks;
- struct lock* waiting_for_lock;
+ struct lock* waiting_lock;
     //
     
     

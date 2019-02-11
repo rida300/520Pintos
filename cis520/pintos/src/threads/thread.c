@@ -569,7 +569,7 @@ init_thread (struct thread *t, const char *name, int priority, tid_t tid)
   {
 	  t->priority_stack[i] = -1;
   }
-  t->waiting_for_lock = NULL;
+  t->waiting_lock = NULL;
   sema_init(&t->timer_sema, 0);
   
   //end added 
