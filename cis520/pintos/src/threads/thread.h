@@ -94,7 +94,8 @@ struct thread
     
     
     //ADDED
-     int orig_pri;
+        struct list locks;//list of all the locks that a thread holds
+        int orig_pri;
 	int num_locks; 
 	int priorities_donated;
 	int priority_stack[PRIORITY_DONATE_LEVELS];
@@ -188,5 +189,5 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
-
+void thread_priority_donate(struct thread * target, int newPriority);
 #endif /* threads/thread.h */

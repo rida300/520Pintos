@@ -41,6 +41,7 @@
 
    - up or "V": increment the value (and wake up one waiting
      thread, if any). */
+bool comparator_greater_lock_priority(struct list_elem *lock, struct list_elem *lockcomp, void *aux UNUSED);
 void
 sema_init (struct semaphore *sema, unsigned value) 
 {
@@ -377,4 +378,16 @@ cond_broadcast (struct condition *cond, struct lock *lock)
 
   while (!list_empty (&cond->waiters))
     cond_signal (cond, lock);
+}
+
+bool
+comparator_greater_lock_priority(struct list_elem *lock, struct list_elem *lockcomp, void *aux UNUSED)
+{
+	struct lock *a = list_entry(lock, struct lock, lockelem);
+	struct lock *b = list_entry(lockcomp, struct lock, lockelem);
+
+	if(a != NULL && b != NULL)
+	{
+		return a->priority > b->priority;
+	}
 }
