@@ -41,7 +41,7 @@
 
    - up or "V": increment the value (and wake up one waiting
      thread, if any). */
-bool comparator_greater_lock_priority(struct list_elem *lock, struct list_elem *lockcomp, void *aux UNUSED);
+static bool comparator_greater_lock_priority(const struct list_elem *lock,const struct list_elem *lockcomp, void *aux UNUSED);
 void
 sema_init (struct semaphore *sema, unsigned value) 
 {
@@ -179,6 +179,7 @@ lock_init (struct lock *lock)
   ASSERT (lock != NULL);
 
   lock->holder = NULL;
+  lock->priority = PRI_MIN;
   sema_init (&lock->semaphore, 1);
 }
 
@@ -276,6 +277,19 @@ lock_release (struct lock *lock)
 
   lock->holder = NULL;
   sema_up (&lock->semaphore);
+  struct thread * t_current = thread_current();
+  list_remove(&lock->lockelem);
+  if(list_empty(&t_current->locks))
+  {
+	thread_priority_donate(t_current, t_current->orig_pri);
+  }
+  else
+  {
+	 struct lock *highest_lock = list_entry( list_front(&(t_current->locks)), struct lock, lockelem );
+
+         thread_priority_donate(t_current, highest_lock->priority);
+
+  }
 }
 
 /* Returns true if the current thread holds LOCK, false
@@ -380,14 +394,13 @@ cond_broadcast (struct condition *cond, struct lock *lock)
     cond_signal (cond, lock);
 }
 
-bool
-comparator_greater_lock_priority(struct list_elem *lock, struct list_elem *lockcomp, void *aux UNUSED)
+static bool
+comparator_greater_lock_priority(const struct list_elem *lock, const struct list_elem *lockcomp, void *aux UNUSED)
 {
-	struct lock *a = list_entry(lock, struct lock, lockelem);
-	struct lock *b = list_entry(lockcomp, struct lock, lockelem);
+	const struct lock *a = list_entry(lock, struct lock, lockelem);
+	const struct lock *b = list_entry(lockcomp, struct lock, lockelem);
 
-	if(a != NULL && b != NULL)
-	{
+	ASSERT(a != NULL && b != NULL);
 		return a->priority > b->priority;
-	}
+
 }

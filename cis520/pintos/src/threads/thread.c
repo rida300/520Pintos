@@ -561,6 +561,9 @@ init_thread (struct thread *t, const char *name, int priority, tid_t tid)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
+  t->orig_pri = priority;
+  t->waiting_lock = NULL;
+  list_init (&t->locks);
   
   //ADDED
  
@@ -584,7 +587,6 @@ init_thread (struct thread *t, const char *name, int priority, tid_t tid)
   {
 	  t->priority_stack[i] = -1;
   }
-  t->waiting_lock = NULL;
   sema_init(&t->timer_sema, 0);
   
   //end added 
