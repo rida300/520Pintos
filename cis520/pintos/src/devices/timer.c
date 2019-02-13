@@ -107,7 +107,7 @@ void
 timer_sleep (int64_t ticks) 
 {
   struct thread *t = thread_current ();
-
+  
   /* Schedule our wake-up time. */
   t->wakeup_time = timer_ticks () + ticks;
 
@@ -200,15 +200,15 @@ timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
   thread_tick ();
-
-  if (!list_empty (&wait_list))
+  
+    struct list_elem *e = list_begin(&wait_list);
+    for(e; e != list_end(&wait_list); e = list_next(e))
     {
-      struct thread *t = list_entry (list_front (&wait_list),
-                                     struct thread, timer_elem);
-      if (ticks > t->wakeup_time) 
+      struct thread *t = list_entry (e, struct thread, timer_elem);
+     if (ticks >= t->wakeup_time) 
       {
       sema_up (&t->timer_sema);
-      list_pop_front (&wait_list);
+      list_remove(&t->timer_elem);
       thread_unblock(t);
       }
  }
