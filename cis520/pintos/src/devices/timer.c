@@ -117,8 +117,8 @@ timer_sleep (int64_t ticks)
   
   list_insert_ordered (&wait_list, &t->timer_elem,
                        compare_threads_by_wakeup_time, NULL);
-  intr_enable ();
-  thread_block();
+ thread_block(); 
+ intr_enable ();
   /* Wait. */
   sema_down (&t->timer_sema);
   
@@ -209,6 +209,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
       {
       sema_up (&t->timer_sema);
       list_pop_front (&wait_list);
+      thread_unblock(t);
       }
  }
 }
