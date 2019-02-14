@@ -61,7 +61,7 @@ static unsigned thread_ticks;   /* # of timer ticks since last yield. */
 bool thread_mlfqs;
 
 static void kernel_thread (thread_func *, void *aux);
-
+bool comparator_thread_greater_priority(const struct list_elem *ta,const struct list_elem *tb, void *aux UNUSED);
 static void idle (void *aux UNUSED);
 static struct thread *running_thread (void);
 static struct thread *next_thread_to_run (void);
@@ -402,12 +402,12 @@ thread_set_priority (int new_priority)
   struct thread *t_current = thread_current();
   if (t_current->priority == t_current->orig_pri && t_current->priority + new_priority < PRI_MAX)
   {
-    t_current->priority += new_priority;//changed this to add the priority as long as the operation does not set the priority above the max
-    t_current->orig_pri += new_priority;
+    t_current->priority = new_priority;//changed this to add the priority as long as the operation does not set the priority above the max
+    t_current->orig_pri = new_priority;
   }
   // otherwise, it has a donation: the original priority only should have changed
   else {
-    t_current->orig_pri += new_priority;
+    t_current->orig_pri = new_priority;
   }
 
   // if current thread gets its priority decreased, then yield
@@ -710,4 +710,12 @@ allocate_tid (void)
    Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 
+bool
+comparator_thread_greater_priority(const struct list_elem *ta, const struct list_elem *tb, void *aux)
+{
+	const struct thread *a = list_entry(ta, struct thread, elem);
+	const struct thread *b = list_entry(tb, struct thread, elem);
 
+	ASSERT(a != NULL && b != NULL);
+	return a->priority > b->priority;
+}

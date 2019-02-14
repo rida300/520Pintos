@@ -171,7 +171,7 @@ void thread_unblock (struct thread *);
 struct thread *thread_current (void);
 tid_t thread_tid (void);
 const char *thread_name (void);
-
+bool comparator_thread_greater_priority(const struct list_elem *, const struct list_elem *, void *);
 
 
 void thread_requeue(struct list_elem *);//Added
