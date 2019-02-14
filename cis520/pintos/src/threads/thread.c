@@ -236,7 +236,7 @@ thread_create (const char *name, int priority,
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
      member cannot be observed. */
-  old_level = intr_disable ();//added
+ // old_level = intr_disable ();//added
 
   /* Stack frame for kernel_thread(). */
   kf = alloc_frame (t, sizeof *kf);
@@ -253,7 +253,7 @@ thread_create (const char *name, int priority,
   sf->eip = switch_entry;
   sf->ebp = 0;
 
-  intr_set_level (old_level);//ADDED
+ // intr_set_level (old_level);//ADDED
 
   /* Add to run queue. */
   thread_unblock (t);
@@ -400,7 +400,7 @@ thread_set_priority (int new_priority)
 {
    // if the current thread has no donation, then it is normal priority change request.
   struct thread *t_current = thread_current();
-  if (t_current->priority == t_current->orig_pri && t_current->priority + new_priority < PRI_MAX)
+  if (t_current->priority == t_current->orig_pri)
   {
     t_current->priority = new_priority;//changed this to add the priority as long as the operation does not set the priority above the max
     t_current->orig_pri = new_priority;
@@ -424,10 +424,9 @@ thread_set_priority (int new_priority)
 void 
 thread_priority_donate(struct thread * target, int newPriority)
 {
-	if(target->priority + newPriority <  PRI_MAX)
-		target->priority +=  newPriority;
-	else
-		target->priority = newPriority;
+		target->priority =  newPriority;
+
+
 	if(!list_empty(&ready_list) && target == thread_current)
 	{
 		struct thread * next = list_entry(list_begin(&ready_list), struct thread, elem);
@@ -564,7 +563,8 @@ init_thread (struct thread *t, const char *name, int priority, tid_t tid)
   t->orig_pri = priority;
   t->waiting_lock = NULL;
   list_init (&t->locks);
-  
+  t->wakeup_time = NULL;
+ 
   //ADDED
  
   t->orig_pri = priority;//ADDED

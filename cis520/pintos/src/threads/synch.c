@@ -42,12 +42,14 @@
    - up or "V": increment the value (and wake up one waiting
      thread, if any). */
 static bool comparator_greater_lock_priority(const struct list_elem *lock,const struct list_elem *lockcomp, void *aux UNUSED);
+static bool comparator_greater_sema_priority(const struct list_elem *sa, const struct list_elem *sb, void * aux UNUSED);
 void
 sema_init (struct semaphore *sema, unsigned value) 
 {
   ASSERT (sema != NULL);
 
   sema->value = value;
+  sema->priority = PRI_MIN;
   list_init (&sema->waiters);
 }
 
@@ -290,7 +292,8 @@ lock_release (struct lock *lock)
   }
   else
   {
-	 struct lock *highest_lock = list_entry( list_front(&(t_current->locks)), struct lock, lockelem );
+	list_sort(&(t_current->locks), comparator_greater_lock_priority, NULL);
+         struct lock *highest_lock = list_entry( list_front(&(t_current->locks)), struct lock, lockelem );
 
          thread_priority_donate(t_current, highest_lock->priority);
 
@@ -357,7 +360,8 @@ cond_wait (struct condition *cond, struct lock *lock)
   ASSERT (lock_held_by_current_thread (lock));
   
   sema_init (&waiter.semaphore, 0);
-  list_push_back (&cond->waiters, &waiter.elem);
+  waiter.semaphore.priority = thread_current()->priority;
+  list_insert_ordered (&cond->waiters, &(waiter.elem), comparator_greater_sema_priority, NULL);
   lock_release (lock);
   sema_down (&waiter.semaphore);
   lock_acquire (lock);
@@ -408,4 +412,14 @@ comparator_greater_lock_priority(const struct list_elem *lock, const struct list
 	ASSERT(a != NULL && b != NULL);
 		return a->priority > b->priority;
 
+}
+
+static bool
+comparator_greater_sema_priority(const struct list_elem *sa, const struct list_elem *sb, void *aux UNUSED)
+{
+	struct semaphore_elem *a = list_entry(sa, struct semaphore_elem, elem);
+	struct semaphore_elem *b = list_entry(sb, struct semaphore_elem, elem);
+
+	ASSERT(a != NULL && b != NULL);
+	return a->semaphore.priority > b->semaphore.priority;
 }
