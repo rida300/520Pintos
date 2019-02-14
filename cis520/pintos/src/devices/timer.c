@@ -120,7 +120,7 @@ timer_sleep (int64_t ticks)
  thread_block(); 
  intr_enable ();
   /* Wait. */
-  sema_down (&t->timer_sema);
+//  sema_down (&t->timer_sema);
   
 }
 
@@ -200,14 +200,15 @@ timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
   thread_tick ();
-  
+  ASSERT(intr_get_level() == INTR_OFF);
     struct list_elem *e = list_begin(&wait_list);
     for(e; e != list_end(&wait_list); e = list_next(e))
     {
       struct thread *t = list_entry (e, struct thread, timer_elem);
      if (ticks >= t->wakeup_time) 
       {
-      sema_up (&t->timer_sema);
+      t->wakeup_time = 0;
+     // sema_up (&t->timer_sema);
       list_remove(&t->timer_elem);
       thread_unblock(t);
       }
