@@ -236,7 +236,7 @@ thread_create (const char *name, int priority,
   /* Prepare thread for first run by initializing its stack.
      Do this atomically so intermediate values for the 'stack' 
      member cannot be observed. */
- // old_level = intr_disable ();//added
+  old_level = intr_disable ();//added
 
   /* Stack frame for kernel_thread(). */
   kf = alloc_frame (t, sizeof *kf);
@@ -253,7 +253,7 @@ thread_create (const char *name, int priority,
   sf->eip = switch_entry;
   sf->ebp = 0;
 
- // intr_set_level (old_level);//ADDED
+  intr_set_level (old_level);//ADDED
 
   /* Add to run queue. */
   thread_unblock (t);
@@ -325,7 +325,7 @@ thread_current (void)
      of stack, so a few big automatic arrays or moderate
      recursion can cause stack overflow. */
   ASSERT (is_thread (t));
-  ASSERT (t->status == THREAD_RUNNING);
+  ASSERT (t->status == THREAD_RUNNING );
 
   return t;
 }
@@ -402,15 +402,15 @@ thread_set_priority (int new_priority)
 {
    // if the current thread has no donation, then it is normal priority change request.
   struct thread *t_current = thread_current();
-  if (t_current->priority == t_current->orig_pri)
-  {
+ // if (t_current->priority == t_current->orig_pri)
+ // {
     t_current->priority = new_priority;//changed this to add the priority as long as the operation does not set the priority above the max
     t_current->orig_pri = new_priority;
-  }
+ // }
   // otherwise, it has a donation: the original priority only should have changed
-  else {
-    t_current->orig_pri = new_priority;
-  }
+ // else {
+   // t_current->orig_pri = new_priority;
+//  }
 
   // if current thread gets its priority decreased, then yield
   // (foremost entry in ready_list shall have the highest priority)
@@ -441,6 +441,8 @@ thread_priority_donate(struct thread * target, int newPriority)
 int
 thread_get_priority (void) 
 {
+  enum intr_level old_level;
+  old_level = intr_disable();
   return thread_current ()->priority;
 }
 
@@ -572,15 +574,15 @@ init_thread (struct thread *t, const char *name, int priority, tid_t tid)
   t->orig_pri = priority;//ADDED
   t->exit_code = -1;
   t->wait_status = NULL;
-  list_init (&t->children);
+//  list_init (&t->children);
   sema_init (&t->timer_sema, 0);
   t->pagedir = NULL;
   t->pages = NULL;
   t->bin_file = NULL;
-  list_init (&t->fds);
-  list_init (&t->mappings);
-  t->next_handle = 2;
-  t->wd = NULL;
+ // list_init (&t->fds);
+ // list_init (&t->mappings);
+ // t->next_handle = 2;
+ // t->wd = NULL;
   
   t->num_locks=0; 
   t->priorities_donated=0;
@@ -719,5 +721,5 @@ comparator_thread_greater_priority(const struct list_elem *ta, const struct list
 	const struct thread *b = list_entry(tb, struct thread, elem);
 
 	ASSERT(a != NULL && b != NULL);
-	return a->priority > b->priority;
+	return a->priority >  b->priority;
 }

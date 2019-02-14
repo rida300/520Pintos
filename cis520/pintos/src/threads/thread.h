@@ -110,7 +110,7 @@ struct thread
     /* Owned by process.c. */
     int exit_code;                      /* Exit code. */
     struct wait_status *wait_status;    /* This process's completion status. */
-    struct list children;               /* Completion status of children. */
+   // struct list children;               /* Completion status of children. */
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
@@ -126,11 +126,11 @@ struct thread
     struct file *bin_file;              /* The binary executable. */
 
     /* Owned by syscall.c. */
-    struct list fds;                    /* List of file descriptors. */
-    struct list mappings;               /* Memory-mapped files. */
-    int next_handle;                    /* Next handle value. */
-    void *user_esp;                     /* User's stack pointer. */
-    struct dir *wd;                     /* Working directory. */
+    //struct list fds;                    /* List of file descriptors. */
+   // struct list mappings;               /* Memory-mapped files. */
+   // int next_handle;                    /* Next handle value. */
+   // void *user_esp;                     /* User's stack pointer. */
+   // struct dir *wd;                     /* Working directory. */
 
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */

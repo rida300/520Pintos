@@ -98,7 +98,7 @@ compare_threads_by_wakeup_time (const struct list_elem *a_,
   const struct thread *a = list_entry (a_, struct thread, timer_elem);
   const struct thread *b = list_entry (b_, struct thread, timer_elem);
 
-  return a->wakeup_time < b->wakeup_time;
+  return a->wakeup_time > b->wakeup_time;
 }
 
 /* Sleeps for approximately TICKS timer ticks.  Interrupts must
