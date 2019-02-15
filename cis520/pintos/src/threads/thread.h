@@ -102,6 +102,8 @@ struct thread
 	int nice;
 	int64_t wait_ticks;
  struct lock* waiting_lock;
+struct list donors_list;
+struct list_elem donor_elem;
     //
     
     
@@ -189,5 +191,6 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
-void thread_priority_donate(struct thread * target, int newPriority);
+void thread_priority_donate(struct lock *);
+void thread_release_priority(struct lock *);
 #endif /* threads/thread.h */

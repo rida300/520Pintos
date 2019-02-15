@@ -219,25 +219,25 @@ lock_acquire (struct lock *lock)
   struct thread* t_current = thread_current();
  
   t_current->waiting_lock = lock;
-  if(t_holder==NULL)
+  if(t_holder!=NULL)
   {
-
-  current_lock->priority = t_current->priority;
+   thread_priority_donate(lock);
+ // current_lock->priority = t_current->priority;
   }
-  while(t_holder != NULL && t_holder->priority < t_current->priority)
-  {
+ // while(t_holder != NULL && t_holder->priority < t_current->priority)
+ // {
   //The current thread donates it priority to the thread which is holding the lcok
-  thread_priority_donate(t_holder, t_current->priority);
+ // thread_priority_donate(t_holder, t_current->priority);
 
-  if(current_lock-> priority < t_current->priority)
-  {
-     current_lock->priority = t_current->priority;
-  }
+ // if(current_lock-> priority < t_current->priority)
+ // {
+   //  current_lock->priority = t_current->priority;
+ // }
 
-  current_lock = t_holder->waiting_lock;
-  if(current_lock == NULL) break;
-  t_holder = current_lock->holder;
-  }
+ // current_lock = t_holder->waiting_lock;
+  //if(current_lock == NULL) break;
+ // t_holder = current_lock->holder;
+ // }
   
   
   // ends ADDED
@@ -288,22 +288,18 @@ lock_release (struct lock *lock)
   ASSERT (lock_held_by_current_thread (lock));
 
   lock->holder = NULL;
+  thread_release_priority(lock);
   sema_up (&lock->semaphore);
   struct thread * t_current = thread_current();
   list_remove(&lock->lockelem);
-  if(list_empty(&t_current->locks))
-  {
-	thread_priority_donate(t_current, t_current->orig_pri);
-  }
-  else
-  {
+ /*if(!list_empty(&t_current->locks))
+{
 	list_sort(&(t_current->locks), comparator_greater_lock_priority, NULL);
          struct lock *highest_lock = list_entry( list_front(&(t_current->locks)), struct lock, lockelem );
 
-         thread_priority_donate(t_current, highest_lock->priority);
+         thread_priority_donate(highest_lock);
 
-  }
-  
+  }*/
 }
 
 /* Returns true if the current thread holds LOCK, false
