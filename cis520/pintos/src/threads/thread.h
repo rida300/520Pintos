@@ -104,8 +104,6 @@ struct thread
  struct lock* waiting_lock;
 struct list donors_list;
 struct list_elem donor_elem;
-struct list donation_list;
-struct list_elem donation_list_elem;
     //
     
     
