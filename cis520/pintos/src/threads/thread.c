@@ -137,7 +137,6 @@ thread_init (void)
   lock_init (&tid_lock);
   list_init (&ready_list);
   list_init (&all_list);
-
   /* Set up a thread structure for the running thread. */
   initial_thread = running_thread ();
   init_thread (initial_thread, "main", PRI_DEFAULT);
@@ -653,15 +652,17 @@ init_thread (struct thread *t, const char *name, int priority)
   t->waiting_lock = NULL;
   list_init (&t->locks);
   list_init (&t->donors_list);
+  list_init (&t->file_descriptors);
   t->wakeup_time = NULL;
  
   //ADDED
  
   t->orig_pri = priority;//ADDED
-  t->exit_code = -1;
+  t->exit_status = -1;
   t->wait_status = NULL;
-//  list_init (&t->children);
+  list_init (&t->children);
   sema_init (&t->timer_sema, 0);
+  sema_init (&t->being_waited_on, 0);
   t->pagedir = NULL;
   t->pages = NULL;
   t->bin_file = NULL;

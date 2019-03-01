@@ -49,7 +49,7 @@ pagedir_destroy (uint32_t *pd)
 
 /* Returns the address of the page table entry for virtual
    address VADDR in page directory PD.
-   If PD does not have a page table for VADDR, behavior depends
+write   If PD does not have a page table for VADDR, behavior depends
    on CREATE.  If CREATE is true, then a new page table is
    created and a pointer into it is returned.  Otherwise, a null
    pointer is returned. */
