@@ -347,5 +347,3 @@ check_addr (const void *vaddr)
 	}
 	return ptr;
 }
-
-
